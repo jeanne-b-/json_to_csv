@@ -5,23 +5,29 @@ require 'csv'
 class JsonToCsv
   attr_accessor :json, :separator, :json_separator
 
-  def initialize(json_file, params = {})
-    @json = JSON.parse(File.read(json_file))
+  def initialize(array_or_file, params = {})
+    if array_or_file.is_a? String
+      @json = JSON.parse(File.read(array_or_file))
+    elsif array_or_file.is_a? Array and array_or_file.all? {|elem| elem.is_a? Hash}
+      @json = array_or_file
+    else
+      raise ArgumentError, 'Argument should be a file or an array of hash'
+    end
+
     @separator = params.fetch(:separator, ',')
     @json_separator = params.fetch(:json_separator, '.')
   end
 
   def csv
-    if @json.any?
-      flattened_json = json.map {|hash| flatten_hash(hash) }
-      csv_string = CSV.generate(col_sep: @separator) do |csv|
-        csv << flattened_json.first.keys
-        flattened_json.each do |elem|
-          csv << elem.values
-        end
+    return "" unless json.any?
+    flattened_json = json.map { |hash| flatten_hash(hash) }
+    csv_string = CSV.generate(col_sep: @separator) do |csv|
+      csv << flattened_json.first.keys
+      flattened_json.each do |elem|
+        csv << elem.values
       end
-      csv_string
     end
+    csv_string
   end
 
   def export(file_name = './export.csv')
