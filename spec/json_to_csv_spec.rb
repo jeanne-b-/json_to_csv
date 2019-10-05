@@ -18,4 +18,22 @@ RSpec.describe JsonToCsv do
     expect(@converter.json.all? {|elem| elem.has_key?("id")}).to be true
     expect(@converter.json.all? {|elem| elem.has_key?("email")}).to be true
   end
+
+  it 'makes a CSV' do
+    expect(@converter.as_csv).to be_a_kind_of(String)
+  end
+
+  it 'users.json is exported correctly' do
+    expect(@converter.as_csv).to eq File.read('./spec/files/users.csv')
+  end
+
+  context('flatten_hash') do
+    it 'flattens deeply nested hash' do
+      expect(@converter.flatten_hash({z: 0, a: {b: {c: 1}}})).to eq({'z' => 0, 'a.b.c' => 1})
+    end
+
+    it 'flattens arrays' do
+      expect(@converter.flatten_hash({z: [1,2,3]})).to eq({'z' => "1,2,3"})
+    end
+  end
 end
