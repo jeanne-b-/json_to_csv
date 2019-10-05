@@ -25,7 +25,7 @@ class JsonToCsv
     end
   end
 
-  def as_csv
+  def csv
     if @json.any?
       flattened_json = json.map {|hash| flatten_hash(hash) }
       csv_string = CSV.generate(col_sep: @separator) do |csv|
