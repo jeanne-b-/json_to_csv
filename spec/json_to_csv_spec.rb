@@ -28,7 +28,7 @@ RSpec.describe JsonToCsv do
   end 
 
   it 'users.json is exported as a csv file' do
-    export_path = './spec/fieles/export.csv'
+    export_path = './spec/files/export.csv'
     @convert.export(export_path)
     expect(File.exists?(export_path)).to be true
     expect(File.read(export_path)).to eq File.read('./spec/files/users.csv')

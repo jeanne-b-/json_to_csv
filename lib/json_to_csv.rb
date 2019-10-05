@@ -1,4 +1,4 @@
-# require "json_to_csv/version"
+require "json_to_csv/version"
 require 'json'
 require 'csv'
 
