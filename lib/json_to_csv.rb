@@ -11,6 +11,27 @@ class JsonToCsv
     @json_separator = params.fetch(:json_separator, '.')
   end
 
+  def csv
+    if @json.any?
+      flattened_json = json.map {|hash| flatten_hash(hash) }
+      csv_string = CSV.generate(col_sep: @separator) do |csv|
+        csv << flattened_json.first.keys
+        flattened_json.each do |elem|
+          csv << elem.values
+        end
+      end
+      csv_string
+    end
+  end
+
+  def export(file_name = './export.csv')
+    File.open(file_name, 'w+') do |f|
+      f.write(csv)
+    end
+  end
+
+  private
+
   def flatten_hash(hash)
     hash.each_with_object({}) do |(key, value_or_hash), h|
       if value_or_hash.is_a? Hash
@@ -25,16 +46,4 @@ class JsonToCsv
     end
   end
 
-  def csv
-    if @json.any?
-      flattened_json = json.map {|hash| flatten_hash(hash) }
-      csv_string = CSV.generate(col_sep: @separator) do |csv|
-        csv << flattened_json.first.keys
-        flattened_json.each do |elem|
-          csv << elem.values
-        end
-      end
-      csv_string
-    end
-  end
 end

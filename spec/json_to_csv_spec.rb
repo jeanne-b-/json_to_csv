@@ -23,8 +23,15 @@ RSpec.describe JsonToCsv do
     expect(@converter.csv).to be_a_kind_of(String)
   end
 
-  it 'users.json is exported correctly' do
+  it 'users.json is correctly made as a csv string' do
     expect(@converter.csv).to eq File.read('./spec/files/users.csv')
+  end 
+
+  it 'users.json is exported as a csv file' do
+    export_path = './spec/fieles/export.csv'
+    @convert.export(export_path)
+    expect(File.exists?(export_path)).to be true
+    expect(File.read(export_path)).to eq File.read('./spec/files/users.csv')
   end
 
   it 'stringifies the value if it contains a column separator' do
@@ -39,6 +46,20 @@ RSpec.describe JsonToCsv do
 
     it 'flattens arrays' do
       expect(@converter.flatten_hash({z: [1,2,3]})).to eq({'z' => "1,2,3"})
+    end
+  end
+
+  context('has options') do
+    it 'changes column separator' do
+      converter = JsonToCsv.new(separator: ';')
+      converter.json = [a: 1, b: 2]
+      expect(converter.csv).to eq "a;b\n1;2\n"
+    end
+
+    it 'changes json separator' do
+      converter = JsonToCsv.new(json_separator: ';')
+      converter.json = [{a: {b: 2}}]
+      expect(converter.csv).to eq "a;b\n2\n"
     end
   end
 end
